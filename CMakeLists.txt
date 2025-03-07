@@ -4,7 +4,7 @@ project(Thunder_Note_Client VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Quick Network)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -15,8 +15,12 @@ qt_add_executable(appThunder_Note_Client
 qt_add_qml_module(appThunder_Note_Client
     URI Thunder_Note_Client
     VERSION 1.0
+    SOURCES
+        notemodel.h notemodel.cpp
     QML_FILES
         Main.qml
+        NoteListView.qml
+        EditNote.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -31,7 +35,7 @@ set_target_properties(appThunder_Note_Client PROPERTIES
 )
 
 target_link_libraries(appThunder_Note_Client
-    PRIVATE Qt6::Quick
+    PRIVATE Qt6::Quick Qt6::Network
 )
 
 include(GNUInstallDirs)

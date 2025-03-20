@@ -30,7 +30,7 @@ Item {
                 onClicked: _noteModel.erase(index)
             }
             TapHandler {
-                onTapped: stackView.push("EditNote.qml", {"index": index, "note": model._note})
+                onTapped: stackView.push("EditNote.qml", {"index": index, "note": model._fullNote})
             }
         }
         RoundButton {

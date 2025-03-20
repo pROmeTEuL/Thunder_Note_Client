@@ -35,6 +35,14 @@ private:
             , note(note)
             , date(date)
         { }
+        QString shortNote() const
+        {
+            auto idx = note.indexOf("\n");
+            if (idx == -1)
+                idx = note.length();
+            idx = std::min<int>(idx, 25);
+            return note.left(idx);
+        }
         int id;
         QString note;
         QDateTime date;

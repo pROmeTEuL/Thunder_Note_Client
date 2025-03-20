@@ -12,7 +12,8 @@ Frame {
         RowLayout {
             Layout.fillWidth: true
             RoundButton {
-                text: "<-"
+                text: "←"
+                font.pixelSize: 16
                 onClicked: {
                     stackView.pop()
                     console.log("Back")
@@ -22,7 +23,8 @@ Frame {
                 Layout.fillWidth: true
             }
             RoundButton {
-                text: "V"
+                text: "✓"
+                font.pixelSize: 16
                 onClicked: {
                     if (index === -1) {
                         _noteModel.add(textArea.text)

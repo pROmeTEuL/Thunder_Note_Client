@@ -11,6 +11,7 @@ namespace {
 const auto url = u"http://127.0.0.1:8080"_s;
 enum Roles {
     Note = Qt::UserRole,
+    FullNote,
     Date
 };
 } //namespace
@@ -36,6 +37,8 @@ void NoteModel::erase(int row)
 
 void NoteModel::add(const QString &note)
 {
+    if (note.isEmpty())
+        return;
     QNetworkRequest request;
     QJsonObject obj;
     obj.insert("note", note);
@@ -52,6 +55,8 @@ void NoteModel::add(const QString &note)
 
 void NoteModel::edit(int row, const QString &note)
 {
+    if (note.isEmpty())
+        return;
     QNetworkRequest request;
     QJsonObject obj;
     obj.insert("note", note);
@@ -79,6 +84,8 @@ QVariant NoteModel::data(const QModelIndex &index, int role) const
         return {};
     switch (role) {
     case Note:
+        return m_notes[index.row()].shortNote();
+    case FullNote:
         return m_notes[index.row()].note;
     case Date:
         return m_notes[index.row()].date;
@@ -90,6 +97,7 @@ QHash<int, QByteArray> NoteModel::roleNames() const
 {
     static const QHash<int, QByteArray> roles {
         {Note, "_note"},
+        {FullNote, "_fullNote"},
         {Date, "_date"}
     };
     return roles;

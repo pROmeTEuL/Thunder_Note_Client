@@ -24,10 +24,24 @@ public:
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
-    void retreiveNotes();
+
 private:
-    std::vector<std::pair<QString, QDateTime>> m_notes;
+    void retreiveNotes();
+
+private:
+    struct NoteData {
+        NoteData(int id, const QString &note, const QDateTime &date)
+            : id(id)
+            , note(note)
+            , date(date)
+        { }
+        int id;
+        QString note;
+        QDateTime date;
+    };
+    std::vector<NoteData> m_notes;
     QNetworkAccessManager m_qnam;
+    QByteArray m_data;
     // std::shared_ptr<QNetworkRequestFactory> m_serviceApi;
     // std::shared_ptr<QRestAccessManager> m_manager;
 };

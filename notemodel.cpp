@@ -1,6 +1,14 @@
 #include "notemodel.h"
 
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QNetworkReply>
+
+using namespace Qt::StringLiterals;
+
 namespace {
+const auto url = u"http://127.0.0.1:8080"_s;
 enum Roles {
     Note = Qt::UserRole,
     Date
@@ -9,30 +17,53 @@ enum Roles {
 
 NoteModel::NoteModel()
 {
-    for (int i = 1; i <= 50; ++i) {
-        m_notes.emplace_back(QString("Note %1").arg(i), QDateTime::currentDateTime());
-    }
+    retreiveNotes();
 }
 
 void NoteModel::erase(int row)
 {
-    beginRemoveRows({}, row, row);
-    m_notes.erase(m_notes.begin() + row);
-    endRemoveRows();
+    QNetworkRequest request;
+    request.setUrl(url + "/api/v1/notes/" + QString::number(m_notes[row].id));
+    QNetworkReply *reply = m_qnam.deleteResource(request);
+    connect(reply, &QNetworkReply::finished, this, [this, reply] {
+        if (reply->error() == QNetworkReply::NoError) {
+            retreiveNotes();
+        } else {
+            qDebug() << reply->errorString();
+        }
+    });
 }
 
 void NoteModel::add(const QString &note)
 {
-    beginInsertRows({}, m_notes.size(), m_notes.size());
-    m_notes.emplace_back(note, QDateTime::currentDateTime());
-    endInsertRows();
+    QNetworkRequest request;
+    QJsonObject obj;
+    obj.insert("note", note);
+    request.setUrl(url + "/api/v1/notes");
+    QNetworkReply *reply = m_qnam.post(request, QJsonDocument{obj}.toJson());
+    connect(reply, &QNetworkReply::finished, this, [this, reply] {
+        if (reply->error() == QNetworkReply::NoError) {
+            retreiveNotes();
+        } else {
+            qDebug() << reply->errorString();
+        }
+    });
 }
 
 void NoteModel::edit(int row, const QString &note)
 {
-    m_notes[row].first = note;
-    m_notes[row].second = QDateTime::currentDateTime();
-    emit dataChanged(createIndex(row, 0), createIndex(row, 0));
+    QNetworkRequest request;
+    QJsonObject obj;
+    obj.insert("note", note);
+    request.setUrl(url + "/api/v1/notes/" + QString::number(m_notes[row].id));
+    QNetworkReply *reply = m_qnam.put(request, QJsonDocument{obj}.toJson());
+    connect(reply, &QNetworkReply::finished, this, [this, reply] {
+        if (reply->error() == QNetworkReply::NoError) {
+            retreiveNotes();
+        } else {
+            qDebug() << reply->errorString();
+        }
+    });
 }
 
 int NoteModel::rowCount(const QModelIndex &parent) const
@@ -48,9 +79,9 @@ QVariant NoteModel::data(const QModelIndex &index, int role) const
         return {};
     switch (role) {
     case Note:
-        return m_notes[index.row()].first;
+        return m_notes[index.row()].note;
     case Date:
-        return m_notes[index.row()].second;
+        return m_notes[index.row()].date;
     }
     return {};
 }
@@ -66,7 +97,29 @@ QHash<int, QByteArray> NoteModel::roleNames() const
 
 void NoteModel::retreiveNotes()
 {
+    m_notes.clear();
     QNetworkRequest request;
-    request.setUrl(QUrl("127.0.0.1:8080/api/v1/notes"));
+    request.setUrl(url + "/api/v1/notes");
     QNetworkReply *reply = m_qnam.get(request);
+    connect(reply, &QNetworkReply::readyRead, this, [this, reply] {
+        m_data += reply->readAll();
+    });
+    connect(reply, &QNetworkReply::finished, this, [this, reply] {
+        if (reply->error() == QNetworkReply::NoError) {
+            QJsonParseError err;
+            const auto doc = QJsonDocument::fromJson(m_data, &err);
+            if (err.error == QJsonParseError::NoError) {
+                const auto data = doc.array();
+                beginResetModel();
+                for (const auto &o : data) {
+                    const auto obj = o.toObject();
+                    m_notes.emplace_back(obj["id"].toInt(), obj["note"].toString(), QDateTime::fromString(obj["date"].toString(), Qt::ISODate));
+                }
+                endResetModel();
+            }
+            m_data.clear();
+        } else {
+            qDebug() << reply->errorString();
+        }
+    });
 }

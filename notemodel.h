@@ -19,6 +19,7 @@ public slots:
     void erase(int row);
     void add(const QString &note);
     void edit(int row, const QString &note);
+    void refresh();
     // QAbstractItemModel interface
 public:
     int rowCount(const QModelIndex &parent) const;

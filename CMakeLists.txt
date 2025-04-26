@@ -12,6 +12,12 @@ qt_add_executable(appThunder_Note_Client
     main.cpp
 )
 
+qt_add_resources(appThunder_Note_Client "resources"
+    PREFIX "/"
+    FILES
+         qtquickcontrols2.conf
+)
+
 qt_add_qml_module(appThunder_Note_Client
     URI Thunder_Note_Client
     VERSION 1.0

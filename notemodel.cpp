@@ -72,6 +72,11 @@ void NoteModel::edit(int row, const QString &note)
     });
 }
 
+void NoteModel::refresh()
+{
+    retreiveNotes();
+}
+
 int NoteModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())

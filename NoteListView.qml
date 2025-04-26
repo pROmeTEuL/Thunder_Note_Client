@@ -5,6 +5,10 @@ import QtQuick.Layouts
 Item {
     ListView {
         id: noteListView
+
+        property int pullThreshold: 60
+        property bool refreshing: false
+
         anchors.fill: parent
         anchors.margins: 25
         anchors.bottomMargin: 10
@@ -31,6 +35,15 @@ Item {
             }
             TapHandler {
                 onTapped: stackView.push("EditNote.qml", {"index": index, "note": model._fullNote})
+            }
+        }
+        onContentYChanged: {
+            console.log(contentY)
+            if (contentY < -pullThreshold && !refreshing && dragging) {
+                refreshing = true
+            } else if (!contentY && refreshing) {
+                refreshing = false
+                _noteModel.refresh()
             }
         }
         RoundButton {

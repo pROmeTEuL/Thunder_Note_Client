@@ -8,7 +8,7 @@
 using namespace Qt::StringLiterals;
 
 namespace {
-const auto url = u"http://127.0.0.1:8080"_s;
+const auto url = u"http://127.0.0.1:53998"_s;
 enum Roles {
     Note = Qt::UserRole,
     FullNote,
@@ -40,6 +40,7 @@ void NoteModel::add(const QString &note)
     if (note.isEmpty())
         return;
     QNetworkRequest request;
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QJsonObject obj;
     obj.insert("note", note);
     request.setUrl(url + "/api/v1/notes");
@@ -88,7 +89,7 @@ QVariant NoteModel::data(const QModelIndex &index, int role) const
     case FullNote:
         return m_notes[index.row()].note;
     case Date:
-        return m_notes[index.row()].date;
+        return m_notes[index.row()].date.toString("dd.MM.yyyy hh:mm");
     }
     return {};
 }

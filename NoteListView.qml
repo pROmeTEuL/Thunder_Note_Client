@@ -17,13 +17,13 @@ Item {
                 // required property string title
                 text: model._note
             }
+            Item {
+                Layout.fillWidth: true
+            }
             Label {
                 // required property string entryDate
                 text: model._date
-            }
-            Item {
-                Layout.fillWidth: true
-
+                Layout.rightMargin: 10
             }
             Button {
                 text: "Erase"

@@ -5,7 +5,7 @@
 #include <QDateTime>
 #include <QNetworkAccessManager>
 // #include <QNetworkRequestFactory>
-// #include <QRestAccessManager>
+#include <QRestAccessManager>
 
 #include <vector>
 
@@ -51,7 +51,7 @@ private:
     QNetworkAccessManager m_qnam;
     QByteArray m_data;
     // std::shared_ptr<QNetworkRequestFactory> m_serviceApi;
-    // std::shared_ptr<QRestAccessManager> m_manager;
+    std::shared_ptr<QRestAccessManager> m_manager;
 };
 
 #endif // NOTEMODEL_H

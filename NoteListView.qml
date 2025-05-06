@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 
 Item {
     ListView {
@@ -18,20 +19,21 @@ Item {
             id: noteDelgate
             width: noteListView.width
             Label {
-                // required property string title
                 text: model._note
             }
             Item {
                 Layout.fillWidth: true
             }
             Label {
-                // required property string entryDate
                 text: model._date
                 Layout.rightMargin: 10
             }
             Button {
                 text: "Erase"
-                onClicked: _noteModel.erase(index)
+                onClicked: {
+                    confirmDialog.itemIndex = index;
+                    confirmDialog.open();
+                }
             }
             TapHandler {
                 onTapped: stackView.push("EditNote.qml", {"index": index, "note": model._fullNote})
@@ -53,6 +55,20 @@ Item {
             }
             text: "+"
             onClicked: stackView.push("EditNote.qml")
+        }
+    }
+    Dialog {
+        property int itemIndex: -1
+        id: confirmDialog
+        title: "Confirm Deletion"
+        anchors.centerIn: parent
+        modal: true
+        standardButtons: Dialog.Yes | Dialog.No
+        onAccepted: _noteModel.erase(itemIndex)
+        contentItem: Text {
+            text: "Are you sure you want to delete this note?"
+            color: "white"
+            wrapMode: Text.Wrap
         }
     }
 }

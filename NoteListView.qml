@@ -40,7 +40,6 @@ Item {
             }
         }
         onContentYChanged: {
-            console.log(contentY)
             if (contentY < -pullThreshold && !refreshing && dragging) {
                 refreshing = true
             } else if (!contentY && refreshing) {

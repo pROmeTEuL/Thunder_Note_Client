@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Thunder Note
+Exec=AppRun %F
+Icon=notes
+Comment=Notes app
+Terminal=false
+Categories=Office
